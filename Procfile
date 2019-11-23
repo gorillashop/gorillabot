@@ -1,1 +1,1 @@
-bot: python voyager3.py
+bot: python my_bot.py
