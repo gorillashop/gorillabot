@@ -1,1 +1,1 @@
-bot: python voyager3.py
+web: python voyager3.py
