@@ -1,4 +1,7 @@
 import telebot
+import os
+from flask import Flask, request
+import logging
 import datetime
 i = datetime.datetime.now()
 from telebot import types
@@ -11,18 +14,18 @@ bot = telebot.TeleBot(API_TOKEN)
 user_dict = {}
 
 price = ("""
-Чай
+Шишки
 0,5г. = 140 UAH
 от 1г. до 4г. = 220 UAH/г.
 от 5г. до 10г. = 200 UAH/г.
 ---------------------------
-Кохфе
+Амф
 0.5г. = 200 UAH
 от 1г. до 4г. = 360 UAH/г.
 от 5г. до 9г. = 330 UAH/г.
 10г. = 3000 грн
 ---------------------------
-Цикорий
+Nbom
 от 1г. до 4г. = 170 UAH/г.
 от 5г. до 9г. = 160 UAH/г.
 от 10г. до 20г. = 150 UAH/г.
@@ -95,7 +98,7 @@ def process_name_step(message):
 		user = User(name)
 		user_dict[chat_id] = user
 		markup = types.ReplyKeyboardMarkup(one_time_keyboard=False)
-		markup.add('Чай', 'Кохфе', 'Цикорий')
+		markup.add('Шишки', 'Амф', 'Nbom')
 		msg = bot.reply_to(message, 'Что хочешь купить?', reply_markup=markup)
 		bot.register_next_step_handler(msg, process_age_step)
 	except Exception as e:
@@ -107,21 +110,21 @@ def process_age_step(message):
 		chat_id = message.chat.id
 		sex = message.text
 		user = user_dict[chat_id]
-		if (sex == u'Чай') or (sex == u'Кохфе') or (sex == u'Цикорий'):
+		if (sex == u'Шишки') or (sex == u'Амф') or (sex == u'Nbom'):
 			user.sex = sex
 		else:
 			raise Exception()
-		if (sex == u'Чай'):
+		if (sex == u'Шишки'):
 			markup = types.ReplyKeyboardMarkup(one_time_keyboard=False)
 			markup.add('0,5г. = 140UAH', '1-4г. = 220UAH', '5-10г. = 200UAH')
 			msg = bot.reply_to(message, 'Сколько отсыпать?', reply_markup=markup)
 			bot.register_next_step_handler(msg, process_age1_step)
-		elif (sex == u'Цикорий'):
+		elif (sex == u'Nbom'):
 			markup = types.ReplyKeyboardMarkup(one_time_keyboard=False)
 			markup.add('1-4г. = 170UAH', '5-9г. = 160UAH', '10-20г. = 150UAH')
 			msg = bot.reply_to(message, 'Сколько отсыпать?', reply_markup=markup)
 			bot.register_next_step_handler(msg, process_age1_step)
-		elif (sex == u'Кохфе'):
+		elif (sex == u'Амф'):
 			markup = types.ReplyKeyboardMarkup(one_time_keyboard=False)
 			markup.add('0,5г. = 200UAH', '1-4г. = 360UAH', '5-9г. = 330UAH', '10г. = 3000UAH')
 			msg = bot.reply_to(message, 'Сколько отсыпать?', reply_markup=markup)
@@ -135,47 +138,47 @@ def process_age1_step(message):
 		age = message.text
 		sex1 = message.text
 		user = user_dict[chat_id]
-		if (age == '0,5г. = 140UAH') and (user.sex == 'Чай'):
+		if (age == '0,5г. = 140UAH') and (user.sex == 'Шишки'):
 			process_sex_step(message)
-		elif (age == '1-4г. = 220UAH') and (user.sex == 'Чай'):
+		elif (age == '1-4г. = 220UAH') and (user.sex == 'Шишки'):
 			markup = types.ReplyKeyboardMarkup(one_time_keyboard=False)
 			markup.add('1г. = 220 UAH', '2г. = 440 UAH', '3г. = 660 UAH', '4г. = 880 UAH')
 			msg = bot.reply_to(message, 'Уточни', reply_markup=markup)
 			bot.register_next_step_handler(msg, process_sex_step)
-		elif (age == '5-10г. = 200UAH') and (user.sex == 'Чай'):
+		elif (age == '5-10г. = 200UAH') and (user.sex == 'Шишки'):
 			markup = types.ReplyKeyboardMarkup(one_time_keyboard=False)
 			markup.add('5г. = 1000 UAH', '6г. = 1200 UAH', '7г. = 1400 UAH', '8г. = 1600 UAH','9г. = 1800 UAH','10г. = 2000 UAH')
 			msg = bot.reply_to(message, 'Уточни', reply_markup=markup)
 			bot.register_next_step_handler(msg, process_sex_step)
-		elif (age == '0,5г. = 200UAH') and (user.sex == 'Кохфе'):
+		elif (age == '0,5г. = 200UAH') and (user.sex == 'Амф'):
 			process_sex_step(message)
-		elif (age == '1-4г. = 360UAH') and (user.sex == 'Кохфе'):
+		elif (age == '1-4г. = 360UAH') and (user.sex == 'Амф'):
 			markup = types.ReplyKeyboardMarkup(one_time_keyboard=False)
 			markup.add('1г. = 360UAH', '2г. = 720UAH', '3г. = 1080UAH', '4г. = 1440UAH')
 			msg = bot.reply_to(message, 'Уточни', reply_markup=markup)
 			bot.register_next_step_handler(msg, process_sex_step)
-		elif (age == '5-9г. = 330UAH') and (user.sex == 'Кохфе'):
+		elif (age == '5-9г. = 330UAH') and (user.sex == 'Амф'):
 			markup = types.ReplyKeyboardMarkup(one_time_keyboard=False)
 			markup.add('5г. = 1650 UAH', '6г. = 1980 UAH', '7г. = 2310 UAH', '8г. = 2640 UAH','9г. = 2970 UAH')
 			msg = bot.reply_to(message, 'Уточни', reply_markup=markup)
 			bot.register_next_step_handler(msg, process_sex_step)
-		elif (age == '10г. = 3000UAH') and (user.sex == 'Кохфе'):
+		elif (age == '10г. = 3000UAH') and (user.sex == 'Амф'):
 			process_sex_step(message)
-		elif (age == '10г. = 1300UAH') and (user.sex == 'Цикорий'):
+		elif (age == '10г. = 1300UAH') and (user.sex == 'Nbom'):
 			markup = types.ReplyKeyboardMarkup(one_time_keyboard=False)
 			msg = bot.reply_to(message, 'Уточни', reply_markup=markup)
 			bot.register_next_step_handler(msg, process_sex_step)
-		elif (age == '1-4г. = 170UAH') and (user.sex == 'Цикорий'):
+		elif (age == '1-4г. = 170UAH') and (user.sex == 'Nbom'):
 			markup = types.ReplyKeyboardMarkup(one_time_keyboard=False)
 			markup.add('1г. = 170 UAH', '2г. = 340 UAH', '3г. = 510 UAH', '4г. = 680 UAH')
 			msg = bot.reply_to(message, 'Уточни', reply_markup=markup)
 			bot.register_next_step_handler(msg, process_sex_step)
-		elif (age == '5-9г. = 160UAH') and (user.sex == 'Цикорий'):
+		elif (age == '5-9г. = 160UAH') and (user.sex == 'Nbom'):
 			markup = types.ReplyKeyboardMarkup(one_time_keyboard=False)
 			markup.add('5г. = 800 UAH', '6г. = 960 UAH', '7г. = 1120 UAH', '8г. = 1280 UAH','9г. = 1440 UAH')
 			msg = bot.reply_to(message, 'Уточни', reply_markup=markup)
 			bot.register_next_step_handler(msg, process_sex_step)
-		elif (age == '10-20г. = 150UAH') and (user.sex == 'Цикорий'):
+		elif (age == '10-20г. = 150UAH') and (user.sex == 'Nbom'):
 			markup = types.ReplyKeyboardMarkup(one_time_keyboard=False)
 			msg = bot.reply_to(message, 'Введи вручную от 10 до 20 (только число)', reply_markup=markup)
 			bot.register_next_step_handler(msg, process_sex_step)
@@ -198,8 +201,7 @@ def process_sex_step(message):
 		msg = bot.reply_to(message, 'Твой заказ принят! ' + '\nID заказа: #' + user.orderid +'\nРайон: ' + user.name + '\nТовар: ' + user.sex + '\nВес: ' + str(user.age) + '\nЦена: ' + str(user.age1) + '\nМожем переходить к оплате!', reply_markup=markup)
 		markup = types.InlineKeyboardMarkup()
 		btn_easypay = types.InlineKeyboardButton(text='EasyPay', url='https://easypay.ua/catalog/e-money/easypay/easypay-money-deposit')
-		btn_globalmoney = types.InlineKeyboardButton(text='globalmoney', url='https://easypay.ua/catalog/e-money/global-wallet')
-		markup.add(btn_easypay, btn_globalmoney)
+		markup.add(btn_easypay)
 		bot.send_message(message.chat.id, """Реквизиты для оплаты:
 EasyPay: 52862223
 globalmoney: 84018360427423
